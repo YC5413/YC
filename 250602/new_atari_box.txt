@@ -1,0 +1,50 @@
+代码详解
+make_env() 函数
+
+使用 gym.make("ALE/Boxing-v5", render_mode="rgb_array") 创建 Gymnasium Atari 环境。
+
+render_mode="rgb_array"：环境本身不自动弹出窗口，而是每一步以 RGB 数组形式生成画面，可由 env.render() 显示。
+
+DummyVecEnv
+
+将单一环境包装成向量化环境，SB3 训练时会并行采样（虽然这里只有一个副本）。
+
+返回的 env 支持 env.reset() → (obs, info)，env.step(action) → (obs, reward, terminated, truncated, info)。
+
+VecTransposeImage
+
+Gymnasium Atari 默认输出 (height, width, channel)、dtype=uint8。
+
+VecTransposeImage 会把 shape 转为 (channel, height, width) 并自动把 uint8 → float32、归一化到 [0,1]。这样可以直接馈入 PyTorch 的卷积神经网络。
+
+设备选择 (mps 或 cpu)
+
+torch.backends.mps.is_available() 在 M1/M2/M3 环境下返回 True，模型会使用 mps 加速。
+
+如果你在非 Apple Silicon 环境，或 mps 驱动未安装，会自动回退到 cpu。
+
+PPO 模型参数
+
+CnnPolicy：使用内置卷积网络。
+
+normalize_images=True（默认）会帮你把 uint8 → float32/255。若改为 False，需自行在 wrapper 中做转换。
+
+verbose=1：输出训练日志。
+
+device=device：使用 mps 或 cpu。
+
+训练流程
+
+model.learn(total_timesteps=TIMESTEPS)：在 DummyVecEnv 上训练 100,000 步。
+
+训练日志会显示 loss、entropy、learning rate 等信息，可自行在终端观察。
+
+测试流程
+
+obs, info = env.reset()：新版 Gymnasium 回传 2 项，其中 obs 已经是 (3, 210, 160) 的 float32 tensor；info 包含一些调试信息，但对训练无影响。
+
+env.render() 会自动弹出一个窗口（Stella 模拟器）显示当前游戏画面。
+
+obs, reward, terminated, truncated, info = env.step(action)：新版 API 回传 5 项，分别是下一帧 obs、单步 reward、是否 terminated（自然结束）、是否 truncated（超时或被外部终止）以及 info。
+
+如果 terminated or truncated，说明一集结束，重新调用 env.reset().

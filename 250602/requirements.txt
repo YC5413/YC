@@ -1,0 +1,21 @@
+# 基礎工具
+numpy>=1.23,<2
+matplotlib
+pandas
+
+# Gymnasium Atari（含授權 ROM）與 ALE 後端
+gymnasium[atari]==0.28.1
+
+# Stable-Baselines3 最新支援 gymnasium 的版本
+stable-baselines3
+
+# PyTorch（Apple Silicon 會自動使用 mps）
+torch==2.7.1
+#
+# To activate this environment, use
+#
+#     $ conda activate atari
+#
+# To deactivate an active environment, use
+#
+#     $ conda deactivate
