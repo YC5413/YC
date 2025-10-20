@@ -1,0 +1,23 @@
+# requirements for OpenMario (Python 3.8, 64-bit)
+# NOTE: Install torch with CUDA wheels from official PyTorch index first:
+# python -m pip install torch==2.4.1+cu118 torchvision torchaudio --index-url https://download.pytorch.org/whl/cu118
+
+# core ML / RL
+# torch==2.4.1+cu118
+stable-baselines3
+sb3-contrib
+
+# environment & gym wrappers
+gym
+gym-super-mario-bros
+nes-py
+
+# common packages
+numpy
+opencv-python
+pygame
+tensorboard
+
+# optional: for headless servers use opencv-python-headless instead of opencv-python
+# To install all (except torch wheel) in one step:
+# python -m pip install -r requirements.txt
